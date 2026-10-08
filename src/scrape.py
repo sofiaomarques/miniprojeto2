@@ -57,18 +57,6 @@ def baixar_html(url: str, dados_post: dict | None = None) -> str:
 
 
 def parsear_mares(html: str, ano: int, mes: int) -> list[dict]:
-    """Extrai da tábua mensal uma linha por evento de maré.
-
-    Estrutura no HTML (tabela `#tabla_mareas`):
-      - cada dia é um `<tr onclick="Day('2025-1-1')">`;
-      - dentro dele, até 4 `td.tabla_mareas_marea`, um por maré. Em dias com
-        só 3 marés a quarta célula vem vazia;
-      - o tipo da maré está na classe do ícone: `tabla_mareas_marea_pleamar`
-        (alta) ou `tabla_mareas_marea_bajamar` (baixa);
-      - o coeficiente fica em `td.tabla_mareas_coeficiente_numero`;
-      - a fase da lua é só um ícone: a classe `icon-hsN` traz a idade da lua
-        em dias (0 = lua nova, ~15 = lua cheia).
-    """
     soup = BeautifulSoup(html, "html.parser")
     linhas = []
     for tr in soup.select("#tabla_mareas tr[onclick]"):
@@ -130,11 +118,6 @@ def parsear_previsao(html: str, ano: int) -> list[dict]:
 
 
 def coletar_mares_do_ano(ano: int) -> pd.DataFrame:
-    """Junta os 12 meses da tábua de marés de `ano` num DataFrame.
-
-    O site troca de mês com um formulário (`#form_calendario`) que faz POST
-    do campo `fecha` (AAAA-MM-DD) para a própria URL.
-    """
     linhas = []
     for mes in range(1, 13):
         html = baixar_html(URL_BASE, {"fecha": f"{ano:04d}-{mes:02d}-01"})
